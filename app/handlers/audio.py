@@ -7,17 +7,14 @@ router = Router(name="audio_router")
 async def handle_media(message: Message):
     if message.audio:
         media_type = "File âm thanh"
-        file_id = message.audio.file_id
     elif message.voice:
         media_type = "Tin nhắn thoại"
-        file_id = message.voice.file_id
     else:
         media_type = "Video"
-        file_id = message.video.file_id
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🎵 Trích xuất thành file MP3", callback_data=f"audio:to_mp3:{file_id}")],
-        [InlineKeyboardButton(text="🎙️ Gõ thành văn bản (Speech-to-Text)", callback_data=f"audio:transcribe:{file_id}")],
+        [InlineKeyboardButton(text="🎵 Trích xuất thành file MP3", callback_data="action:to_mp3")],
+        [InlineKeyboardButton(text="🎙️ Gõ thành văn bản (Speech-to-Text)", callback_data="action:transcribe")],
     ])
 
     await message.reply(
