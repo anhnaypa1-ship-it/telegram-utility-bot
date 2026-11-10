@@ -1,0 +1,24 @@
+# Môi trường ảo Python
+venv/
+.venv/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Biến môi trường chứa secret (KHÔNG đưa lên GitHub)
+.env
+
+# Thư mục chứa file tạm khi xử lý
+temp/
+downloads/
+outputs/
+
+# Hệ thống
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
