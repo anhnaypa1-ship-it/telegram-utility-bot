@@ -32,25 +32,31 @@ async def extract_text_from_image(image_path: Path) -> str:
             "- Chỉ trả về nội dung văn bản trích xuất được, tuyệt đối không thêm lời chào hoặc bình luận thừa."
         )
 
-        # Thử với model gemini-2.5-flash hoặc gemini-2.0-flash / 1.5-flash
-        model_name = "gemini-2.5-flash"
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=[img, prompt]
-            )
-        except Exception:
-            # Fallback sang gemini-2.0-flash hoặc gemini-1.5-flash
-            response = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=[img, prompt]
-            )
+        # Danh sách các model theo khuyến nghị mới nhất từ Google API
+        models_to_try = [
+            "gemini-3.8-flash",
+            "gemini-2.5-flash",
+            "gemini-1.5-flash"
+        ]
 
-        result_text = response.text or ""
-        if not result_text.strip():
-            return "🔍 Không phát hiện thấy nội dung chữ nào rõ ràng trong bức ảnh này."
+        last_error = None
+        for model_name in models_to_try:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=[img, prompt]
+                )
+                result_text = response.text or ""
+                if not result_text.strip():
+                    return "🔍 Không phát hiện thấy nội dung chữ nào rõ ràng trong bức ảnh này."
+                return result_text.strip()
+            except Exception as ex:
+                last_error = ex
+                logger.warning(f"Model {model_name} thất bại, đang thử model tiếp theo: {ex}")
+                continue
 
-        return result_text.strip()
+        # Nếu thử tất cả các model đều lỗi
+        raise last_error
 
     except Exception as e:
         logger.error(f"Lỗi khi gọi Gemini OCR: {e}", exc_info=True)
